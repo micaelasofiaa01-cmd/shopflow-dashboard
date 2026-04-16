@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShopFlow Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+
+    <!-- React via CDN — adicionar no <head> do index.html -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 </head>
 <body>
  
@@ -32,16 +37,8 @@
                 <h2>Stock de Produtos</h2>
                 <span class="sf-badge" id="badge-stock">0 produtos</span>
             </div>
-            <!-- Substituir a secção de filtros no painel de stock -->
-            <div class="sf-painel__filtros">
-              <button class="sf-btn sf-btn--activo" data-categoria="todos">Todos</button>
-              <button class="sf-btn" data-categoria="Portáteis">Portáteis</button>
-              <button class="sf-btn" data-categoria="Periféricos">Periféricos</button>
-              <button class="sf-btn" data-categoria="Monitores">Monitores</button>
-              <button class="sf-btn" data-categoria="Acessórios">Acessórios</button>
-            </div>
-
-            <div id="lista-produtos" class="sf-lista-produtos">
+        
+            <div id="react-stock" class="sf-lista-produtos">
                 <p class="sf-placeholder">A carregar produtos...</p>
             </div>
         </section>
@@ -133,6 +130,7 @@
  
     </main>
     <script src="config.js"></script>
+    <script type="text/babel" src="PainelStock.jsx"></script>
     <script src="app.js"></script>
 </body>
 </html>

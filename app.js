@@ -10,7 +10,7 @@ const ShopFlow = {
   versao: '2.0',
 
   cache: {},
-  
+
   loja: {
       nome: 'ShopFlow',
       cidade: 'Porto',
@@ -225,8 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const primeiroBotao = document.querySelector('.sf-btn');
   if (primeiroBotao) primeiroBotao.classList.add('sf-btn--activo');
 
-  // NOVO: Carregar os produtos a partir do JSON
-  carregarProdutos();
 
   // NOVO (Sessão 4): Ligar ao servidor WebSocket
   ShopFlow.reconectar = true;  // Permitir reconexão automática
