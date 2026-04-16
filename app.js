@@ -229,6 +229,13 @@ document.addEventListener('DOMContentLoaded', () => {
   ShopFlow.reconectar = true;  // Permitir reconexão automática
   ligarWebSocket();
 
+  // NOVO — Sessão 5: APIs externas
+  actualizarPainelMeteo();
+  actualizarPainelCambios();
+
+  // Actualização periódica automática
+  setInterval(actualizarPainelMeteo,   CONFIG.INTERVALO_METEO);
+  setInterval(actualizarPainelCambios, CONFIG.INTERVALO_CAMBIOS);
 });
 
 // ── Painel de Vendas em Tempo Real ───────────────────
@@ -408,4 +415,63 @@ async function pedirDadosMeteo() {
     return dados;
 }
  
+// ── Painel de Câmbios ────────────────────────────────
+ 
+const MOEDAS_CAMBIO = [
+    { codigo: 'USD', nome: 'Dólar americano'  },
+    { codigo: 'GBP', nome: 'Libra esterlina'  },
+    { codigo: 'CHF', nome: 'Franco suíço'     },
+];
+ 
+async function pedirDadosCambios() {
+    const agora = Date.now();
+    if (ShopFlow.cache.cambios &&
+        (agora - ShopFlow.cache.cambiosTimestamp) < CONFIG.INTERVALO_CAMBIOS) {
+        return ShopFlow.cache.cambios;
+    }
+    const resposta = await fetch(
+        `https://open.er-api.com/v6/latest/${CONFIG.MOEDA}`);
+    if (!resposta.ok) throw new Error(`ExchangeRate: ${resposta.status}`);
+    const dados = await resposta.json();
+    if (dados.result !== 'success') throw new Error('Resposta inválida');
+    ShopFlow.cache.cambios = dados;
+    ShopFlow.cache.cambiosTimestamp = agora;
+    return dados;
+}
+ 
+async function actualizarPainelCambios() {
+    const painel = document.getElementById('cambios-conteudo');
+    if (!painel) return;
+    try {
+        const dados = await pedirDadosCambios();
+        const rates = dados.rates;
+        const ultimaAct = new Date(dados.time_last_update_utc)
+            .toLocaleDateString('pt-PT', {
+                day: 'numeric', month: 'long',
+                hour: '2-digit', minute: '2-digit'
+            });
+        const itensHtml = MOEDAS_CAMBIO.map(moeda => {
+            const taxa = rates[moeda.codigo];
+            if (!taxa) return '';
+            return `
+                <div class="sf-cambio-item">
+                    <div>
+                        <div class="sf-cambio-par">
+                            ${CONFIG.MOEDA} &rarr; ${moeda.codigo}
+                        </div>
+                        <div class="sf-cambio-base">${moeda.nome}</div>
+                    </div>
+                    <div class="sf-cambio-valor">${taxa.toFixed(4)}</div>
+                </div>`;
+        }).join('');
+        painel.innerHTML = `
+            <div class="sf-cambios-lista">${itensHtml}</div>
+            <div class="sf-cambios-actualizado">
+                Actualizado: ${ultimaAct}</div>`;
+    } catch (erro) {
+        console.error('Erro câmbios:', erro);
+        painel.innerHTML =
+            '<div class="sf-api-erro">Não foi possível obter dados de câmbio.</div>';
+    }
+}
 
