@@ -8,6 +8,9 @@
 // Vai crescer em cada sessão.
 const ShopFlow = {
   versao: '2.0',
+
+  cache: {},
+  
   loja: {
       nome: 'ShopFlow',
       cidade: 'Porto',
